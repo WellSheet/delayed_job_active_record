@@ -130,7 +130,7 @@ module Delayed
           # SQL for Postgres if we use a .limit() filter, but it would not
           # use 'FOR UPDATE' and we would have many locking conflicts
           quoted_name = connection.quote_table_name(table_name)
-          subquery    = ready_scope.limit(1).lock(true).select("id").to_sql
+          subquery    = ready_scope.limit(1).lock('FOR UPDATE SKIP LOCKED').select("id").to_sql
           sql         = "UPDATE #{quoted_name} SET locked_at = ?, locked_by = ? WHERE id IN (#{subquery}) RETURNING *"
           reserved    = find_by_sql([sql, now, worker.name])
           reserved[0]
